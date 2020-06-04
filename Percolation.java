@@ -3,6 +3,16 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
+    //TODOS
+//    LINT THE
+//    FUCK OUT
+//    OF THIS
+//    SHIT,
+//    HANDLE ERRORS
+//    CORRECTLY,
+//    FIX BACKWASH
+//    PROBLEM!
+
     // creates n-by-n grid, with all sites initially blocked
     private boolean[][] grid;
     //    private boolean percolated = false;
@@ -13,8 +23,8 @@ public class Percolation {
     public Percolation(int n) {
         if (n <= 0) throw new IllegalArgumentException();
         gridid = new WeightedQuickUnionUF(n * n + 2);
-        grid = new boolean[n + 1][n + 1];
-        sink = getGridId(n, n) + 1;
+        grid = new boolean[n][n];
+        sink = getGridId(n - 1, n - 1) + 1;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 grid[i][j] = false;
@@ -24,7 +34,8 @@ public class Percolation {
     }
 
     private int getGridId(int row, int col) {
-        return (row - 1) * grid.length + col;
+        return row * grid.length + col + 1;
+//        return (row - 1) * grid.length + col;
     }
 
 
@@ -76,6 +87,7 @@ public class Percolation {
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
+        StdOut.println(row + " " + col);
         try {
             if ((row >= 0 && row < grid.length) && (col >= 0 && col < grid.length))
                 if (!grid[row][col]) {
