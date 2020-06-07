@@ -76,9 +76,8 @@ public class PercolationStats {
         StdOut.println("95% confidence lo = " + stats.confidenceLo());
 
 
-//        System.out.println("Type the size of the grid: ");
-//        System.out.println("How many trials? ");
-//        PercolationStats ps = new PercolationStats(gridSize, trials);
+        System.out.println("Type the size of the grid: ");
+        System.out.println("How many trials? ");
 
 
     }

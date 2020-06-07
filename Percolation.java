@@ -1,28 +1,21 @@
-import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    //TODOS
-//    LINT THE
-//    FUCK OUT
-//    OF THIS
-//    SHIT,
-//    HANDLE ERRORS
-//    CORRECTLY,
-//    FIX BACKWASH
-//    PROBLEM!
-
+    /**
+     * grid contains the blocks to open and perform operations
+     * openSites counts how many sites are open
+     * gridId refers to the element the pair row/col represents
+     * sink is the virtual bottom to percolate
+     */
     // creates n-by-n grid, with all sites initially blocked
     private boolean[][] grid;
-    //    private boolean percolated = false;
     private int openSites = 0;
-    private final WeightedQuickUnionUF gridid;
+    private final WeightedQuickUnionUF gridId;
     private final int sink;
 
     public Percolation(int n) {
-        if (n <= 0) throw new IllegalArgumentException();
-        gridid = new WeightedQuickUnionUF(n * n + 2);
+        gridId = new WeightedQuickUnionUF(n * n + 2);
         grid = new boolean[n][n];
         sink = getGridId(n - 1, n - 1) + 1;
         for (int i = 0; i < n; i++) {
@@ -35,7 +28,7 @@ public class Percolation {
 
     private int getGridId(int row, int col) {
         return row * grid.length + col + 1;
-//        return (row - 1) * grid.length + col;
+//        return (row - 1) * (grid.length - 1) + col;
     }
 
 
@@ -50,21 +43,20 @@ public class Percolation {
         // check top
         if (neighborRow >= 0) {
             if (grid[neighborRow][neighborCol])
-                gridid.union(currentPoint, getGridId(neighborRow, neighborCol));
+                gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
 
         } else {
             // default
-
-            gridid.union(0, currentPoint);
+            gridId.union(0, currentPoint);
         }
         // check bottom
         neighborRow = row + 1;
         if (neighborRow < grid.length) {
             if (grid[neighborRow][neighborCol])
-                gridid.union(currentPoint, getGridId(neighborRow, neighborCol));
+                gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
         } else if (!percolates()) {
             // default
-            gridid.union(sink, currentPoint);
+            gridId.union(sink, currentPoint);
         }
 
         // check right
@@ -72,14 +64,14 @@ public class Percolation {
         neighborCol = col + 1;
         if (neighborCol < grid.length)
             if (grid[neighborRow][neighborCol])
-                gridid.union(currentPoint, getGridId(neighborRow, neighborCol));
+                gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
 
 
         // check left
         neighborCol = col - 1;
         if (neighborCol >= 0)
             if (grid[neighborRow][neighborCol])
-                gridid.union(currentPoint, getGridId(neighborRow, neighborCol));
+                gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
 
 
     }
@@ -87,42 +79,37 @@ public class Percolation {
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        StdOut.println(row + " " + col);
-        try {
-            if ((row >= 0 && row < grid.length) && (col >= 0 && col < grid.length))
-                if (!grid[row][col]) {
-                    grid[row][col] = true;
-                    openSites += 1;
-                    uniteNeighbors(row, col);
-                    StdOut.println("row = " + row + " col = " + col);
+        if ((row < 0 || row >= grid.length)
+                || (col < 0 || col >= grid.length))
+            throw new IllegalArgumentException("row/col must be between 0 and grid length");
 
-                }
-        } catch (IllegalArgumentException ex) {
-//            StdOut.println(ex.getMessage());
+        if (!grid[row][col]) {
+            grid[row][col] = true;
+            openSites += 1;
+            uniteNeighbors(row, col);
+
         }
+
 
     }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        try {
-            return grid[row][col];
-        } catch (IllegalArgumentException ex) {
-//            StdOut.println(ex.getMessage());
+        if ((row < 0 || row >= grid.length)
+                || (col < 0 || col >= grid.length))
+            throw new IllegalArgumentException("row/col must be between 0 and grid length");
 
-        }
-
-        return false;
+        return grid[row][col];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        try {
-            return gridid.find(0) == gridid.find(getGridId(row, col));
-        } catch (IllegalArgumentException ex) {
-//            StdOut.println(ex.getMessage());
-        }
-        return false;
+        if ((row < 0 || row >= grid.length)
+                || (col < 0 || col >= grid.length))
+            throw new IllegalArgumentException("row/col must be between 0 and grid length");
+
+
+        return gridId.find(0) == gridId.find(getGridId(row, col));
     }
 
     // returns the number of open sites
@@ -132,7 +119,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        return gridid.find(0) == gridid.find(sink);
+        return gridId.find(0) == gridId.find(sink);
     }
 
 
