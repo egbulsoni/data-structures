@@ -15,11 +15,13 @@ public class Percolation {
     private final int sink;
 
     public Percolation(int n) {
+        if (n <= 0)
+            throw new IllegalArgumentException();
         gridId = new WeightedQuickUnionUF(n * n + 2);
-        grid = new boolean[n][n];
-        sink = getGridId(n - 1, n - 1) + 1;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        grid = new boolean[n + 1][n + 1];
+        sink = getGridId(n, n) + 1;
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
                 grid[i][j] = false;
             }
         }
@@ -27,10 +29,16 @@ public class Percolation {
     }
 
     private int getGridId(int row, int col) {
-        return row * grid.length + col + 1;
-//        return (row - 1) * (grid.length - 1) + col;
+//        return row * grid.length + col + 1;
+        return (row - 1) * (grid.length - 1) + col;
     }
 
+    private void validateInput(int row, int col) {
+        if (row < 1 || row > grid.length)
+            throw new IllegalArgumentException();
+        if (col < 1 || col > grid.length)
+            throw new IllegalArgumentException();
+    }
 
     private void uniteNeighbors(int row, int col) {
 
@@ -41,7 +49,7 @@ public class Percolation {
         neighborRow = row - 1;
         neighborCol = col;
         // check top
-        if (neighborRow >= 0) {
+        if (neighborRow >= 1) {
             if (grid[neighborRow][neighborCol])
                 gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
 
@@ -69,19 +77,16 @@ public class Percolation {
 
         // check left
         neighborCol = col - 1;
-        if (neighborCol >= 0)
+        if (neighborCol >= 1)
             if (grid[neighborRow][neighborCol])
                 gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
-
 
     }
 
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col) {
-        if ((row < 0 || row >= grid.length)
-                || (col < 0 || col >= grid.length))
-            throw new IllegalArgumentException("row/col must be between 0 and grid length");
+        validateInput(row, col);
 
         if (!grid[row][col]) {
             grid[row][col] = true;
@@ -95,20 +100,13 @@ public class Percolation {
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col) {
-        if ((row < 0 || row >= grid.length)
-                || (col < 0 || col >= grid.length))
-            throw new IllegalArgumentException("row/col must be between 0 and grid length");
-
+        validateInput(row, col);
         return grid[row][col];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col) {
-        if ((row < 0 || row >= grid.length)
-                || (col < 0 || col >= grid.length))
-            throw new IllegalArgumentException("row/col must be between 0 and grid length");
-
-
+        validateInput(row, col);
         return gridId.find(0) == gridId.find(getGridId(row, col));
     }
 
