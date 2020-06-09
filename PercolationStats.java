@@ -16,14 +16,14 @@ public class PercolationStats {
             throw new IllegalArgumentException();
 
         this.trials = trials;
-
         thresholds = new double[trials];
-        for (int i = 0; i < trials; i++) {
+
+        for (int i = 0; i < this.trials; i++) {
             Percolation perc = new Percolation(n);
-            int opened = 0;
+            double opened = 0;
             while (!perc.percolates()) {
-                int p = StdRandom.uniform(0, n);
-                int q = StdRandom.uniform(0, n);
+                int p = StdRandom.uniform(1, n + 1);
+                int q = StdRandom.uniform(1, n + 1);
                 if (!perc.isOpen(p, q)) {
                     perc.open(p, q);
                     opened++;
@@ -31,9 +31,9 @@ public class PercolationStats {
 
 
             }
-            double s = (double) opened / (double) n * n;
+
 //            StdOut.println(s);
-            thresholds[i] = s;
+            thresholds[i] = opened / (n * n);
         }
 
 
@@ -68,16 +68,14 @@ public class PercolationStats {
 
         int n = Integer.parseInt(args[0]);
         int t = Integer.parseInt(args[1]);
+
         PercolationStats stats = new PercolationStats(n, t);
-        StdOut.println("mean = " + stats.mean());
-        StdOut.println("std deviation = " + stats.stddev());
-        StdOut.println("95% confidence hi = " + stats.confidenceHi());
-        StdOut.println("95% confidence lo = " + stats.confidenceLo());
 
 
-        System.out.println("Type the size of the grid: ");
-        System.out.println("How many trials? ");
-
-
+        StdOut.println("mean() = " + stats.mean());
+        StdOut.println("stddev() = " + stats.stddev());
+        StdOut.println("confidence interval = [" + stats.confidenceHi()
+                + ", " + stats.confidenceLo() + "]");
+//
     }
 }

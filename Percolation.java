@@ -10,6 +10,7 @@ public class Percolation {
      */
     // creates n-by-n grid, with all sites initially blocked
     private boolean[][] grid;
+    private boolean[] perCols; // array intended to prevent backwash
     private int openSites = 0;
     private final WeightedQuickUnionUF gridId;
     private final int sink;
@@ -18,13 +19,21 @@ public class Percolation {
         if (n <= 0)
             throw new IllegalArgumentException();
         gridId = new WeightedQuickUnionUF(n * n + 2);
+        perCols = new boolean[n + 1];
         grid = new boolean[n + 1][n + 1];
         sink = getGridId(n, n) + 1;
+
         for (int i = 1; i <= n; i++) {
             for (int j = 1; j <= n; j++) {
                 grid[i][j] = false;
             }
         }
+
+        // populating array
+        for (int i = 0; i <= n; i++) {
+            perCols[i] = false;
+        }
+
 
     }
 
@@ -34,9 +43,9 @@ public class Percolation {
     }
 
     private void validateInput(int row, int col) {
-        if (row < 1 || row > grid.length)
+        if (row < 1 || row >= grid.length)
             throw new IllegalArgumentException();
-        if (col < 1 || col > grid.length)
+        if (col < 1 || col >= grid.length)
             throw new IllegalArgumentException();
     }
 
@@ -62,9 +71,11 @@ public class Percolation {
         if (neighborRow < grid.length) {
             if (grid[neighborRow][neighborCol])
                 gridId.union(currentPoint, getGridId(neighborRow, neighborCol));
-        } else if (!percolates()) {
+        } else {
+            perCols[col] = true;
+            // else if (!percolates())
             // default
-            gridId.union(sink, currentPoint);
+//            gridId.union(sink, currentPoint);
         }
 
         // check right
@@ -92,6 +103,16 @@ public class Percolation {
             grid[row][col] = true;
             openSites += 1;
             uniteNeighbors(row, col);
+            // check if path can be connected to sink
+            for (int i = 1; i < grid.length; i++) {
+                int currentPoint = getGridId(grid.length - 1, i);
+//                int start = gridId.find(0);
+//                int bridge = gridId.find(currentPoint);
+                if (perCols[i] && gridId.find(0) == gridId.find(currentPoint)) {
+                    gridId.union(currentPoint, sink);
+                }
+            }
+
 
         }
 
